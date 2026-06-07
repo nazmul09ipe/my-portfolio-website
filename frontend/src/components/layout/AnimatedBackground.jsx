@@ -9,15 +9,20 @@ export function AnimatedBackground() {
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.innerWidth < 768;
+    
+    if (prefersReducedMotion || isMobile) return; // Disable complex animations on mobile/reduced motion
+
     const orbs = containerRef.current?.querySelectorAll('.orb');
     if (!orbs?.length) return;
 
     orbs.forEach((orb, i) => {
       gsap.to(orb, {
-        x: `random(-150, 150)`,
-        y: `random(-100, 100)`,
-        scale: `random(0.8, 1.2)`,
-        duration: 15 + i * 5,
+        x: `random(-100, 100)`,
+        y: `random(-60, 60)`,
+        scale: `random(0.9, 1.1)`,
+        duration: 20 + i * 5,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',

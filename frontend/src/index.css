@@ -192,12 +192,43 @@ html {
   cursor: none;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 body {
   @apply font-sans antialiased;
   @apply bg-slate-50 text-navy-900;
   @apply dark:bg-void-950 dark:text-slate-100;
   overflow-x: hidden;
   cursor: none;
+  /* GPU acceleration for the whole body to prevent flickering */
+  transform: translateZ(0);
+}
+
+/* ── Optimization Classes ── */
+.gpu-accel {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform, opacity;
+}
+
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
 }
 
 a, button {

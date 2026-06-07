@@ -22,26 +22,35 @@ export function Hero() {
   const mouseY = useSpring(0, springConfig);
 
   useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    
+    if (prefersReducedMotion) return;
+
     const handleMouseMove = (e) => {
+      if (isMobile) return; // Disable mouse parallax on mobile for performance
       const { clientX, clientY } = e;
       const { innerWidth, innerHeight } = window;
       mouseX.set((clientX / innerWidth - 0.5) * 50);
       mouseY.set((clientY / innerHeight - 0.5) * 50);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
     const ctx = gsap.context(() => {
       gsap.from('.hero-line', {
-        y: 120,
+        y: 100,
         opacity: 0,
-        duration: 1.6,
+        duration: 1.4,
         stagger: 0.08,
-        ease: 'expo.out',
-        delay: 2.2, // Wait for page loader
+        ease: 'power2.out',
+        delay: 2.2, 
         clearProps: 'all',
       });
     }, headlineRef);

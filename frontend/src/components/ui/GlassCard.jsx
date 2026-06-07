@@ -27,6 +27,9 @@ export function GlassCard({
 
   const handleMouseMove = (e) => {
     if (!tilt || !ref.current) return;
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) return; // Disable tilt on mobile for better performance
+
     const rect = ref.current.getBoundingClientRect();
     x.set((e.clientX - rect.left) / rect.width - 0.5);
     y.set((e.clientY - rect.top) / rect.height - 0.5);
@@ -45,7 +48,7 @@ export function GlassCard({
       className={cn(
         premium ? 'glass-premium' : (strong ? 'glass-strong' : 'glass'),
         'rounded-[var(--radius-card-lg)] p-6 md:p-8 gradient-border',
-        'transition-all duration-500',
+        'transition-all duration-500 will-change-transform',
         hover && !tilt && 'hover:shadow-glow-md hover:-translate-y-1 dark:hover:bg-navy-800/55',
         tilt && 'hover:dark:bg-navy-800/40',
         className
@@ -59,13 +62,13 @@ export function GlassCard({
       whileHover={hover && !tilt ? { y: -4 } : undefined}
       {...props}
     >
-      <div style={{ transform: tilt ? 'translateZ(50px)' : 'none', transformStyle: 'preserve-3d' }}>
+      <div style={{ transform: tilt ? 'translateZ(30px)' : 'none', transformStyle: 'preserve-3d' }}>
         {children}
       </div>
       
       {tilt && (
         <motion.div 
-          className="absolute inset-0 -z-10 rounded-[inherit] bg-brand-500/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          className="absolute inset-0 -z-10 rounded-[inherit] bg-brand-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
           style={{ x: shadowX, y: shadowY }}
         />
       )}
