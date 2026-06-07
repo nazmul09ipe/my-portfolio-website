@@ -1,12 +1,9 @@
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination, Autoplay } from 'swiper/modules';
-import { HiLocationMarker } from 'react-icons/hi';
+import { HiLocationMarker, HiBriefcase, HiAcademicCap } from 'react-icons/hi';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
 import { experience, education } from '@/data/portfolioData';
-import 'swiper/css';
-import 'swiper/css/pagination';
+import { cn } from '@/utils/cn';
 
 export function Experience() {
   const ref = useScrollAnimation({ children: true, stagger: 0.1 });
