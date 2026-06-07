@@ -34,20 +34,20 @@
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
 
-  --text-display-2xl: 4.5rem;
-  --text-display-xl: 3.75rem;
-  --text-display-lg: 3rem;
-  --text-display-md: 2.25rem;
-  --text-display-sm: 1.875rem;
+  --text-display-2xl: clamp(3.5rem, 8vw, 6rem);
+  --text-display-xl: clamp(3rem, 7vw, 5rem);
+  --text-display-lg: clamp(2.5rem, 6vw, 4rem);
+  --text-display-md: clamp(2rem, 5vw, 3rem);
+  --text-display-sm: clamp(1.5rem, 4vw, 2.25rem);
 
-  --tracking-tighter: -0.04em;
-  --tracking-tight: -0.025em;
+  --tracking-tighter: -0.05em;
+  --tracking-tight: -0.03em;
   --tracking-wide: 0.05em;
-  --tracking-widest: 0.12em;
+  --tracking-widest: 0.15em;
 
-  /* ── Void (black) ── */
-  --color-void-950: #000000;
-  --color-void-900: #030508;
+  /* ── Void (black) — Refined for deeper contrast ── */
+  --color-void-950: #020203;
+  --color-void-900: #050507;
   --color-void-800: #0a0a0f;
 
   /* ── Navy (deep surfaces) ── */
@@ -191,17 +191,50 @@ body {
   @apply bg-brand-500/30 text-brand-900 dark:text-white;
 }
 
-/* ── Glassmorphism ── */
-.glass {
-  @apply backdrop-blur-2xl border;
-  @apply bg-white/55 border-white/40 shadow-glass;
-  @apply dark:bg-navy-900/45 dark:border-white/[0.08];
+/* ── Noise Texture Overlay ── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.015;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-.glass-strong {
+.dark .noise-overlay {
+  opacity: 0.03;
+}
+
+/* ── Modern Layout Utilities ── */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(12, 1fr);
+    grid-auto-rows: minmax(160px, auto);
+  }
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* ── Refined Glassmorphism ── */
+.glass {
+  @apply backdrop-blur-2xl border;
+  @apply bg-white/45 border-white/30 shadow-glass;
+  @apply dark:bg-navy-900/40 dark:border-white/[0.05];
+}
+
+.glass-premium {
   @apply backdrop-blur-3xl border;
-  @apply bg-white/70 border-white/50 shadow-glass;
-  @apply dark:bg-navy-800/60 dark:border-white/[0.12];
+  @apply bg-white/60 border-white/40 shadow-elevated;
+  @apply dark:bg-navy-900/60 dark:border-white/[0.08] dark:shadow-glow-sm;
 }
 
 /* ── Gradient text ── */

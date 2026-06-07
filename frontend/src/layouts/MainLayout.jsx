@@ -8,6 +8,7 @@ import { ScrollToTop } from '@/components/layout/ScrollToTop';
 export function MainLayout() {
   return (
     <>
+      <div className="noise-overlay" aria-hidden="true" />
       <AnimatedBackground />
       <FloatingParticles />
       <Navbar />
