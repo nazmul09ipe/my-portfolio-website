@@ -21,6 +21,7 @@ export const getSkills = async (req, res, next) => {
 
 export const createSkill = async (req, res, next) => {
   try {
+    if (!dbConnected) throw new ApiError(503, 'Database unavailable');
     const skill = await Skill.create(req.body);
     res.status(201).json({ success: true, data: skill });
   } catch (err) {
@@ -30,6 +31,7 @@ export const createSkill = async (req, res, next) => {
 
 export const updateSkill = async (req, res, next) => {
   try {
+    if (!dbConnected) throw new ApiError(503, 'Database unavailable');
     const skill = await Skill.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -43,6 +45,7 @@ export const updateSkill = async (req, res, next) => {
 
 export const deleteSkill = async (req, res, next) => {
   try {
+    if (!dbConnected) throw new ApiError(503, 'Database unavailable');
     const skill = await Skill.findByIdAndDelete(req.params.id);
     if (!skill) throw new ApiError(404, 'Skill not found');
     res.json({ success: true, message: 'Skill deleted' });

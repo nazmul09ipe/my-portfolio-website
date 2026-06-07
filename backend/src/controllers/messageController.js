@@ -7,17 +7,28 @@ export const createMessage = async (req, res, next) => {
   try {
     const { name, email, subject, message } = req.body;
 
-    // 1. Save to database first (so it's never lost)
-    const newMessage = await Message.create({
-      name,
-      email,
-      subject,
-      message,
-    });
+    let newMessage = null;
+    let dbSaved = false;
+
+    // 1. Try to save to database first
+    if (dbConnected) {
+      try {
+        newMessage = await Message.create({
+          name,
+          email,
+          subject,
+          message,
+        });
+        dbSaved = true;
+      } catch (dbError) {
+        console.error('Database save failed:', dbError.message);
+      }
+    } else {
+      console.warn('Database not connected. Skipping save.');
+    }
 
     // 2. Try to send email notification
-    // We don't necessarily want to block the response if email fails, 
-    // but the user wants it fully functional, so we'll try-catch specifically for email
+    let emailSent = false;
     try {
       await sendEmail({
         name,
@@ -25,16 +36,24 @@ export const createMessage = async (req, res, next) => {
         subject,
         message,
       });
+      emailSent = true;
     } catch (emailError) {
-      console.error('Database saved, but email notification failed:', emailError);
-      // We still return 201 because the message IS saved in the DB
+      console.error('Email notification failed:', emailError.message);
     }
 
-    res.status(201).json({
-      success: true,
-      message: 'Message received successfully',
-      data: newMessage,
-    });
+    // 3. Respond based on what succeeded
+    if (dbSaved || emailSent) {
+      return res.status(201).json({
+        success: true,
+        message: emailSent 
+          ? 'Message received and notification sent.' 
+          : 'Message received (notification pending).',
+        data: newMessage,
+      });
+    }
+
+    // Both failed
+    throw new ApiError(503, 'Message service is currently unavailable. Please try again later.');
   } catch (error) {
     next(error);
   }

@@ -33,6 +33,7 @@ export const getProjectById = async (req, res, next) => {
 
 export const createProject = async (req, res, next) => {
   try {
+    if (!dbConnected) throw new ApiError(503, 'Database unavailable');
     const project = await Project.create(req.body);
     res.status(201).json({ success: true, data: project });
   } catch (err) {
@@ -42,6 +43,7 @@ export const createProject = async (req, res, next) => {
 
 export const updateProject = async (req, res, next) => {
   try {
+    if (!dbConnected) throw new ApiError(503, 'Database unavailable');
     const project = await Project.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
@@ -55,6 +57,7 @@ export const updateProject = async (req, res, next) => {
 
 export const deleteProject = async (req, res, next) => {
   try {
+    if (!dbConnected) throw new ApiError(503, 'Database unavailable');
     const project = await Project.findByIdAndDelete(req.params.id);
     if (!project) throw new ApiError(404, 'Project not found');
     res.json({ success: true, message: 'Project deleted' });

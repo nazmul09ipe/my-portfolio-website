@@ -50,9 +50,12 @@ export function Contact() {
       setForm(initialForm);
     } catch (err) {
       console.error("Contact Form Error:", err);
+      const isUnavailable = err.status === 503;
       toast.error(
-        err.message || "The message service is temporarily down. Please try again later or email me directly.", 
-        { id: toastId, duration: 5000 }
+        isUnavailable 
+          ? "The message service is temporarily overloaded. Please try again in a few minutes or email me directly."
+          : (err.message || "Failed to send message. Please try again later."), 
+        { id: toastId, duration: 6000 }
       );
     } finally {
       setSubmitting(false);

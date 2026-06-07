@@ -18,5 +18,4 @@ const firebaseConfig = {
 // Initialize Firebase 
 const app = initializeApp(firebaseConfig); 
 export const auth = getAuth(app) 
-export const isFirebaseConfigured = Boolean(firebaseConfig.apiKey && firebaseConfig.apiKey.length > 10);
 export default app
