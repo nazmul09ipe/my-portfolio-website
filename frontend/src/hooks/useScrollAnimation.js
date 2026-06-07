@@ -24,18 +24,33 @@ export function useScrollAnimation(options = {}) {
 
     gsap.fromTo(
       targets,
-      { y, opacity },
+      { 
+        y, 
+        opacity,
+        scale: options.scale || 1,
+        rotateX: options.rotateX || 0
+      },
       {
         y: 0,
         opacity: 1,
+        scale: 1,
+        rotateX: 0,
         duration,
         delay,
         stagger: children ? stagger || 0.12 : 0,
-        ease: 'power3.out',
+        ease: 'expo.out',
         scrollTrigger: {
           trigger: el,
           start,
           toggleActions: 'play none none reverse',
+          onEnter: () => {
+            if (options.scrub) return;
+            gsap.to(targets, { 
+              opacity: 1, 
+              y: 0, 
+              stagger: children ? stagger || 0.12 : 0 
+            });
+          }
         },
       }
     );

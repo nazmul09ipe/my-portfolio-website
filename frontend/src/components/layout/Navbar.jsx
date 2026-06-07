@@ -90,8 +90,10 @@ export function Navbar() {
             const isActive = active === link.href;
             return (
               <li key={link.href} className="relative">
-                <a
+                <motion.a
                   href={link.href}
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={(e) => {
                     e.preventDefault();
                     handleNav(link.href);
@@ -104,7 +106,7 @@ export function Navbar() {
                   )}
                 >
                   {link.label}
-                </a>
+                </motion.a>
                 {isActive && (
                   <motion.span
                     layoutId="navbar-active-pill"
