@@ -1,8 +1,12 @@
 import { useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import gsap from 'gsap';
 
 export function AnimatedBackground() {
   const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll();
+  
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
 
   useEffect(() => {
     const orbs = containerRef.current?.querySelectorAll('.orb');
@@ -10,9 +14,10 @@ export function AnimatedBackground() {
 
     orbs.forEach((orb, i) => {
       gsap.to(orb, {
-        x: `random(-100, 100)`,
-        y: `random(-80, 80)`,
-        duration: 10 + i * 2,
+        x: `random(-150, 150)`,
+        y: `random(-100, 100)`,
+        scale: `random(0.8, 1.2)`,
+        duration: 15 + i * 5,
         repeat: -1,
         yoyo: true,
         ease: 'sine.inOut',
@@ -23,39 +28,32 @@ export function AnimatedBackground() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 -z-20 overflow-hidden pointer-events-none"
+      className="fixed inset-0 -z-20 overflow-hidden pointer-events-none bg-void-950"
       aria-hidden
     >
-      <div className="absolute inset-0 bg-slate-50 dark:bg-void-950 transition-colors duration-700" />
+      {/* Dynamic Gradient Mesh */}
+      <motion.div 
+        style={{ rotate }}
+        className="absolute inset-[-50%] opacity-30 dark:opacity-40"
+      >
+        <div className="absolute top-1/4 left-1/4 w-[60%] h-[60%] rounded-full bg-brand-500/20 blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[50%] h-[50%] rounded-full bg-accent-purple-600/20 blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40%] h-[40%] rounded-full bg-accent-cyan-500/15 blur-[80px]" />
+      </motion.div>
 
-      <div className="absolute inset-0 mesh-gradient animate-mesh opacity-80 dark:opacity-100" />
+      {/* Morphing Blobs */}
+      <div className="orb absolute top-[10%] left-[10%] w-[40vw] h-[40vw] rounded-full bg-linear-to-br from-brand-500/10 to-transparent blur-[80px]" />
+      <div className="orb absolute bottom-[10%] right-[10%] w-[35vw] h-[35vw] rounded-full bg-linear-to-tr from-accent-purple-500/10 to-transparent blur-[100px]" />
+      <div className="orb absolute top-[40%] right-[20%] w-[30vw] h-[30vw] rounded-full bg-linear-to-bl from-accent-cyan-400/10 to-transparent blur-[90px]" />
 
-      <div
-        className="absolute inset-0 opacity-[0.35] dark:opacity-[0.5]"
-        style={{
-          backgroundImage: `
-            radial-gradient(at 15% 15%, rgba(59, 130, 246, 0.4) 0px, transparent 45%),
-            radial-gradient(at 85% 8%, rgba(124, 58, 237, 0.35) 0px, transparent 42%),
-            radial-gradient(at 75% 85%, rgba(34, 211, 238, 0.28) 0px, transparent 48%),
-            radial-gradient(at 8% 75%, rgba(37, 99, 235, 0.25) 0px, transparent 45%)
-          `,
-        }}
+      {/* Grid Pattern Overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
+        style={{ 
+          backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.15) 1px, transparent 0)`,
+          backgroundSize: '48px 48px'
+        }} 
       />
-
-      <div className="orb absolute top-[15%] left-[20%] w-80 h-80 rounded-full bg-brand-500/25 blur-[100px] animate-glow" />
-      <div className="orb absolute top-[45%] right-[15%] w-96 h-96 rounded-full bg-accent-purple-600/20 blur-[120px]" />
-      <div className="orb absolute bottom-[20%] left-[35%] w-72 h-72 rounded-full bg-accent-cyan-500/15 blur-[90px] animate-glow" />
-
-      <div
-        className="absolute inset-0 opacity-[0.025] dark:opacity-[0.04]"
-        style={{
-          backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.6) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(59, 130, 246, 0.6) 1px, transparent 1px)`,
-          backgroundSize: '64px 64px',
-        }}
-      />
-
-      <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-void-950/80 dark:to-void-950" />
     </div>
   );
 }

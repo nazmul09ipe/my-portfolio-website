@@ -82,11 +82,13 @@ export function Projects() {
   }, []);
 
   return (
-    <section id="projects" className="section-padding section-alt relative overflow-hidden">
-      {/* Decorative background element */}
-      <div className="absolute top-1/2 left-0 w-1/4 h-1/4 bg-brand-500/5 blur-[120px] -z-10" />
+    <section id="projects" className="section-padding relative overflow-hidden bg-void-950">
+      {/* Background cinematic visuals */}
+      <div className="absolute top-1/2 left-0 w-full h-full pointer-events-none opacity-20">
+        <div className="absolute top-[20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-brand-500/5 blur-[120px]" />
+      </div>
 
-      <div className="container-custom">
+      <div className="container-custom relative z-10">
         <SectionHeading subtitle="Portfolio" title="Featured Projects" />
 
         {loading && (
@@ -107,74 +109,86 @@ export function Projects() {
                 premium 
                 tilt
                 className={cn(
-                  "flex flex-col h-full group transition-all duration-500",
+                  "flex flex-col h-full group border border-white/[0.03] hover:border-brand-500/30 transition-all duration-700 overflow-hidden",
                   isFeatured ? "lg:col-span-8 md:col-span-12" : "lg:col-span-4 md:col-span-6"
                 )}
               >
+                {/* Image Showcase with lighting effect */}
                 <div className={cn(
-                  "overflow-hidden rounded-2xl border border-white/[0.06] mb-8 relative",
+                  "overflow-hidden rounded-2xl mb-8 relative group/img shadow-2xl",
                   isFeatured ? "aspect-video md:aspect-[21/9]" : "aspect-video"
                 )}>
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-linear-to-t from-void-950/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
-                    <div className="flex gap-3 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                      {project.liveUrl && project.liveUrl !== "#" && (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-primary !py-2 !px-4 !text-xs shadow-glow-sm"
-                        >
-                          <HiExternalLink className="w-4 h-4" /> Live Demo
-                        </a>
-                      )}
-                      {project.repoUrl && (
-                        <a
-                          href={project.repoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="glass-premium !py-2 !px-4 !text-xs !bg-white/10"
-                        >
-                          <HiCode className="w-4 h-4" /> Source Code
-                        </a>
-                      )}
-                    </div>
+                  
+                  {/* Glassy Overlay with microinteractions */}
+                  <div className="absolute inset-0 bg-void-950/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center gap-4 backdrop-blur-xs">
+                    {project.liveUrl && project.liveUrl !== "#" && (
+                      <motion.a
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-4 rounded-full bg-brand-500 text-white shadow-glow-sm"
+                      >
+                        <HiExternalLink className="w-6 h-6" />
+                      </motion.a>
+                    )}
+                    {project.repoUrl && (
+                      <motion.a
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        href={project.repoUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-4 rounded-full bg-white/10 text-white backdrop-blur-md border border-white/20"
+                      >
+                        <HiCode className="w-6 h-6" />
+                      </motion.a>
+                    )}
+                  </div>
+                  
+                  {/* Decorative badge */}
+                  <div className="absolute top-4 left-4">
+                    <span className="px-3 py-1 rounded-lg glass-premium text-[9px] font-black uppercase tracking-widest border border-white/10">
+                      {isFeatured ? 'Featured Production' : 'Release'}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex-grow">
-                  <div className="flex flex-wrap gap-2 mb-4">
+                <div className="flex-grow flex flex-col">
+                  <div className="flex flex-wrap gap-2 mb-6">
                     {(project.technologies || []).slice(0, isFeatured ? 6 : 3).map((tech) => (
                       <span
                         key={tech}
-                        className="text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-white/5 border border-slate-200/50 dark:border-white/10 font-bold text-slate-500 dark:text-slate-400"
+                        className="text-[10px] uppercase tracking-[0.2em] px-3 py-1 rounded-full bg-white/[0.03] border border-white/[0.05] font-black text-slate-500 group-hover:text-brand-500 group-hover:border-brand-500/30 transition-all duration-500"
                       >
                         {tech}
                       </span>
                     ))}
-                    {project.technologies?.length > (isFeatured ? 6 : 3) && (
-                      <span className="text-[10px] font-bold text-slate-400 self-center">
-                        +{project.technologies.length - (isFeatured ? 6 : 3)} more
-                      </span>
-                    )}
                   </div>
 
                   <h3 className={cn(
-                    "font-display font-black mb-4 tracking-tighter group-hover:text-brand-500 dark:group-hover:text-accent-cyan-400 transition-colors",
-                    isFeatured ? "text-2xl md:text-3xl" : "text-xl"
+                    "font-display font-black mb-4 tracking-tighter group-hover:text-white transition-colors",
+                    isFeatured ? "text-3xl md:text-5xl" : "text-2xl"
                   )}>
                     {project.title}
                   </h3>
                   <p className={cn(
-                    "text-slate-600 dark:text-slate-400 leading-relaxed mb-6",
-                    isFeatured ? "text-base md:text-lg max-w-2xl" : "text-sm"
+                    "text-slate-500 group-hover:text-slate-400 leading-relaxed mb-8 transition-colors",
+                    isFeatured ? "text-lg md:text-xl max-w-2xl" : "text-sm"
                   )}>
                     {project.description}
                   </p>
+
+                  <div className="mt-auto flex items-center gap-2">
+                    <div className="h-[1px] w-8 bg-brand-500/50" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-500">Case Study</span>
+                  </div>
                 </div>
               </GlassCard>
             );
