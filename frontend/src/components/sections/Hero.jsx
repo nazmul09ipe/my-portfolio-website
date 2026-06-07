@@ -99,6 +99,15 @@ export function Hero() {
           <Button href="#contact" className="shadow-glow-md hover:shadow-glow-lg transition-all !px-10 !py-5 text-sm uppercase tracking-widest font-black">
             Start a Project
           </Button>
+          <Button 
+            variant="secondary" 
+            href={siteConfig.resumeUrl} 
+            download="Md_Nazmul_Haque_Resume.pdf"
+            className="glass !px-8 !py-5 text-sm uppercase tracking-widest font-black"
+          >
+            <HiDownload className="w-5 h-5" />
+            Download CV
+          </Button>
           <div className="flex gap-4">
             <motion.a 
               whileHover={{ scale: 1.1, y: -2 }}
