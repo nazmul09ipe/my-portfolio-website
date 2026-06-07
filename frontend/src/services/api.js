@@ -9,9 +9,24 @@ const api = axios.create({
 api.interceptors.response.use(
   (res) => res,
   (error) => {
+    // Log error for debugging
+    console.error('API Error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message,
+    });
+
     const message =
-      error.response?.data?.message || error.message || 'Something went wrong';
-    return Promise.reject(new Error(message));
+      error.response?.data?.message || 
+      error.message || 
+      'A server error occurred. Please try again later.';
+    
+    // Add status code to error object for UI handling
+    const enhancedError = new Error(message);
+    enhancedError.status = error.response?.status;
+    enhancedError.data = error.response?.data;
+    
+    return Promise.reject(enhancedError);
   }
 );
 

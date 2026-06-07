@@ -43,12 +43,17 @@ export function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    const toastId = toast.loading("Sending your message...");
     try {
       await sendMessage(form);
-      toast.success("Message sent! I will get back to you soon.");
+      toast.success("Message sent! I will get back to you soon.", { id: toastId });
       setForm(initialForm);
     } catch (err) {
-      toast.error(err.message || "Failed to send message. Please try again.");
+      console.error("Contact Form Error:", err);
+      toast.error(
+        err.message || "The message service is temporarily down. Please try again later or email me directly.", 
+        { id: toastId, duration: 5000 }
+      );
     } finally {
       setSubmitting(false);
     }

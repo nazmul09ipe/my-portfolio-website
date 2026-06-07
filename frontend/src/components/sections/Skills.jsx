@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   SiHtml5,
@@ -14,10 +15,13 @@ import {
   SiTypescript,
   SiAxios,
 } from 'react-icons/si';
+import { HiExclamationCircle } from 'react-icons/hi';
 import { SectionHeading } from '@/components/ui/SectionHeading';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import { skills as localSkills } from '@/data/portfolioData';
+import { fetchSkills } from '@/services/skillService';
+import { skills as fallbackSkills } from '@/data/portfolioData';
+import { cn } from '@/utils/cn';
 
 const iconMap = {
   HTML: SiHtml5,
@@ -45,7 +49,25 @@ const categories = [
 ];
 
 export function Skills() {
+  const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const ref = useScrollAnimation({ children: true, stagger: 0.05 });
+
+  useEffect(() => {
+    setError(null);
+    fetchSkills()
+      .then((data) => {
+        if (data?.length) setSkills(data);
+      })
+      .catch((err) => {
+        console.error("Skills Fetch Error:", err);
+        setError(err.message || "Failed to load skills");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const localSkills = skills.length > 0 ? skills : fallbackSkills;
 
   return (
     <section id="skills" className="section-padding relative overflow-hidden bg-void-950">
@@ -57,6 +79,23 @@ export function Skills() {
 
       <div className="container-custom relative z-10">
         <SectionHeading subtitle="Expertise" title="Digital Arsenal" />
+
+        {loading && (
+          <div className="flex justify-center py-20">
+            <div className="w-10 h-10 rounded-full border-2 border-brand-500/20 border-t-brand-500 animate-spin" />
+          </div>
+        )}
+
+        {error && !loading && (
+          <div className="flex justify-center mb-12">
+            <div className="glass-premium px-6 py-3 rounded-2xl border border-red-500/20 flex items-center gap-3">
+              <HiExclamationCircle className="w-5 h-5 text-red-500" />
+              <p className="text-xs font-bold text-red-500/80 uppercase tracking-widest">
+                Service Alert: {error} (Showing cached data)
+              </p>
+            </div>
+          </div>
+        )}
 
         <div ref={ref} className="space-y-32">
           {categories.map((cat) => {

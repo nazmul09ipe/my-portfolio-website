@@ -8,9 +8,13 @@ export const errorHandler = (err, req, res, _next) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.error(err);
-  }
+  // Always log errors for debugging in server logs
+  console.error(`[Error ${statusCode}] ${req.method} ${req.path}:`, {
+    message: err.message,
+    stack: err.stack,
+    body: req.body,
+    query: req.query,
+  });
 
   res.status(statusCode).json({
     success: false,

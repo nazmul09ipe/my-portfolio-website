@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { HiExternalLink, HiCode } from "react-icons/hi";
+import { HiExternalLink, HiCode, HiExclamationCircle } from 'react-icons/hi';
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
@@ -70,14 +70,19 @@ const fallbackProjects = [
 export function Projects() {
   const [projects, setProjects] = useState(fallbackProjects);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const ref = useScrollAnimation({ children: true, stagger: 0.1 });
 
   useEffect(() => {
+    setError(null);
     fetchProjects(true)
       .then((data) => {
         if (data?.length) setProjects(data);
       })
-      .catch(() => {})
+      .catch((err) => {
+        console.error("Projects Fetch Error:", err);
+        setError(err.message || "Failed to load projects");
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -97,10 +102,37 @@ export function Projects() {
           </div>
         )}
 
-        <div
-          ref={ref}
-          className="bento-grid"
-        >
+        {error && !loading && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-20 text-center"
+          >
+            <div className="p-4 rounded-full bg-red-500/10 text-red-500 mb-6">
+              <HiExclamationCircle className="w-12 h-12" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Service Temporarily Unavailable</h3>
+            <p className="text-slate-500 max-w-md mb-8">
+              {error}. We&apos;re currently using cached data to ensure you still have a great experience.
+            </p>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setLoading(true);
+                fetchProjects(true).then(setProjects).catch(setError).finally(() => setLoading(false));
+              }}
+              className="glass"
+            >
+              Try Again
+            </Button>
+          </motion.div>
+        )}
+
+        {!loading && (
+          <div
+            ref={ref}
+            className="bento-grid"
+          >
           {projects.map((project, idx) => {
             const isFeatured = idx === 0;
             return (
