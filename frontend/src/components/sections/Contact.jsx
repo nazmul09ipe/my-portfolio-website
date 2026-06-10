@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 import {
   HiMail,
@@ -34,14 +34,43 @@ const initialForm = { name: "", email: "", subject: "", message: "" };
 export function Contact() {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState({});
   const ref = useScrollAnimation({ children: true, stagger: 0.1 });
 
   const handleChange = (e) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
   };
+
+  const validateForm = useCallback(() => {
+    const newErrors = {};
+    if (!form.name.trim()) newErrors.name = "Name is required";
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
+      newErrors.email = "Email is invalid";
+    }
+    if (!form.message.trim()) newErrors.message = "Message is required";
+    return newErrors;
+  }, [form]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
+
     setSubmitting(true);
     const toastId = toast.loading("Sending your transmission to the digital core...");
     try {
@@ -51,6 +80,7 @@ export function Contact() {
         icon: '🚀',
       });
       setForm(initialForm);
+      setErrors({});
     } catch (err) {
       console.error("Contact Form Error:", err);
       const isUnavailable = err.status === 503;
@@ -66,6 +96,7 @@ export function Contact() {
   };
 
   const inputClass = "input-field";
+  const errorClass = "border-red-500 focus:ring-red-500 focus:border-red-500";
 
   return (
     <section id="contact" className="section-padding">
@@ -119,27 +150,41 @@ export function Contact() {
                     required
                     value={form.name}
                     onChange={handleChange}
-                    className={inputClass}
+                    className={`${inputClass} ${errors.name ? errorClass : ""}`}
                     placeholder="Your name"
+                    aria-invalid={!!errors.name}
+                    aria-describedby={errors.name ? "name-error" : undefined}
                   />
+                  {errors.name && (
+                    <p id="name-error" className="mt-1 text-sm text-red-500">
+                      {errors.name}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium mb-2"
-                  >
+                  className="block text-sm font-medium mb-2"
+                >
                     Email
-                  </label>
-                  <input
+                </label>
+                <input
                     id="email"
                     name="email"
                     type="email"
                     required
                     value={form.email}
                     onChange={handleChange}
-                    className={inputClass}
+                    className={`${inputClass} ${errors.email ? errorClass : ""}`}
                     placeholder="you@email.com"
-                  />
+                    aria-invalid={!!errors.email}
+                    aria-describedby={errors.email ? "email-error" : undefined}
+                />
+                  {errors.email && (
+                    <p id="email-error" className="mt-1 text-sm text-red-500">
+                      {errors.email}
+                    </p>
+                  )}
                 </div>
               </div>
               <div>
@@ -173,10 +218,17 @@ export function Contact() {
                   rows={5}
                   value={form.message}
                   onChange={handleChange}
-                  className={inputClass + " resize-none"}
+                  className={`${inputClass} ${errors.message ? errorClass : ""} resize-none`}
                   placeholder="Tell me about your project..."
+                  aria-invalid={!!errors.message}
+                  aria-describedby={errors.message ? "message-error" : undefined}
                 />
-              </div>
+                {errors.message && (
+                  <p id="message-error" className="mt-1 text-sm text-red-500">
+                    {errors.message}
+                  </p>
+                )}
+        </div>
               <Button
                 type="submit"
                 className="w-full sm:w-auto"
@@ -193,8 +245,9 @@ export function Contact() {
               </Button>
             </form>
           </GlassCard>
-        </div>
+      </div>
       </div>
     </section>
   );
 }
+

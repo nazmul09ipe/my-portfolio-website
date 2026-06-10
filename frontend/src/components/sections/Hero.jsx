@@ -87,8 +87,8 @@ export function Hero() {
         </p>
         
         <h1 className="hero-line font-display text-display-xl md:text-display-2xl font-black leading-[0.9] tracking-tighter mb-8 text-balance" style={{ translateZ: '80px' }}>
-          <span className="block opacity-50">DIGITAL</span>
-          <span className="gradient-text drop-shadow-[0_0_30px_rgba(59,130,246,0.3)]">ARCHITECT</span>
+          <span className="block opacity-50">Md. Nazmul Haque</span>
+          {/* <span className="gradient-text drop-shadow-[0_0_30px_rgba(59,130,246,0.3)]">ARCHITECT</span> */}
         </h1>
         
         <h2 className="hero-line text-xl sm:text-2xl font-bold tracking-tight text-navy-800 dark:text-slate-300 mb-10 text-balance" style={{ translateZ: '50px' }}>

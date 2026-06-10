@@ -5,26 +5,26 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { about, siteConfig } from "@/data/portfolioData";
 
-const highlights = [
-  {
-    icon: HiBriefcase,
-    title: "Current Role",
-    text: `${about.job.title} at ${about.job.company}, ${about.job.location}`,
-  },
-  {
-    icon: HiAcademicCap,
-    title: "Education",
-    text: `${about.degree} — ${about.university}`,
-  },
-  {
-    icon: HiCode,
-    title: "Training",
-    text: `${about.merlinLevel1} · ${about.merlinLevel2}`,
-  },
-];
-
 export function About() {
   const ref = useScrollAnimation({ children: true, stagger: 0.1 });
+
+  const highlights = [
+    {
+      icon: HiBriefcase,
+      title: "Current Role",
+      text: `${about.job.title} at ${about.job.company}, ${about.job.location}`,
+    },
+    {
+      icon: HiAcademicCap,
+      title: "Education",
+      text: `${about.degree} — ${about.university}`,
+    },
+    {
+      icon: HiCode,
+      title: "Training",
+      text: `${about.merlinLevel1} · ${about.merlinLevel2}`,
+    },
+  ];
 
   return (
     <section id="about" className="section-padding relative overflow-hidden">

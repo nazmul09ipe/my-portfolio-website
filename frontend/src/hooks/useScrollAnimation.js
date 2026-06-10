@@ -6,66 +6,54 @@ gsap.registerPlugin(ScrollTrigger);
 
 export function useScrollAnimation(options = {}) {
   const ref = useRef(null);
+
   const {
-    y = 40, // Reduced from 60 for subtler motion
-    opacity = 0,
-    duration = 1,
-    delay = 0,
-    start = 'top 92%', // Trigger a bit later for better performance
-    stagger = 0,
-    children = false,
+    y = 30,
+    duration = 0.8,
+    start = 'top 90%',
+    once = true,
   } = options;
 
   useEffect(() => {
-    // Check for prefers-reduced-motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.innerWidth < 768;
-    
+    if (typeof window === 'undefined') return;
+
     const el = ref.current;
-    if (!el || prefersReducedMotion) {
-      if (el) gsap.set(children ? el.children : el, { opacity: 1, y: 0 });
+    if (!el) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+
+    if (prefersReducedMotion) {
+      gsap.set(el, { opacity: 1, y: 0 });
       return;
     }
 
-    const targets = children ? el.children : el;
+    const isMobile = window.innerWidth < 768;
 
-    // Use will-change to hint GPU
-    gsap.set(targets, { willChange: 'transform, opacity' });
+    // IMPORTANT: ensure visible by default (prevents missing UI)
+    gsap.set(el, { opacity: 1, y: 0 });
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: el,
         start,
-        toggleActions: 'play none none reverse',
-      }
+        once,
+      },
     });
 
-    tl.fromTo(
-      targets,
-      { 
-        y: isMobile ? y / 2 : y, // Half movement on mobile
-        opacity,
-        scale: options.scale || 0.98,
-        rotateX: options.rotateX || 5 // Reduced from 10
-      },
-      {
-        y: 0,
-        opacity: 1,
-        scale: 1,
-        rotateX: 0,
-        duration: isMobile ? duration * 0.8 : duration,
-        delay,
-        stagger: children ? stagger || 0.1 : 0,
-        ease: 'power2.out', // Slightly cheaper than expo
-        clearProps: 'willChange', // Clean up after animation
-      }
-    );
+    tl.from(el, {
+      y: isMobile ? y / 2 : y,
+      opacity: 0,
+      duration,
+      ease: 'power2.out',
+    });
 
     return () => {
-      if (tl.scrollTrigger) tl.scrollTrigger.kill();
       tl.kill();
+      tl.scrollTrigger?.kill();
     };
-  }, [y, opacity, duration, delay, start, stagger, children, options.scale, options.rotateX]);
+  }, []);
 
   return ref;
 }
