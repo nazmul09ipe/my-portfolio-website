@@ -1,6 +1,7 @@
-import api from './api';
-
 export const fetchSkills = async () => {
-  const { data } = await api.get('/skills');
-  return data.data;
+  const res = await api.get('/skills');
+
+  console.log("Skills API response:", res.data);
+
+  return res.data.data || res.data.skills || res.data;
 };

@@ -1,16 +1,15 @@
-import { Message } from '../models/Message.js';
-import { ApiError } from '../utils/ApiError.js';
-import { dbConnected } from '../config/db.js';
-import { sendEmail } from '../utils/sendEmail.js';
+import { Message } from "../models/Message.js";
+import { ApiError } from "../utils/ApiError.js";
+import { dbConnected } from "../config/db.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const createMessage = async (req, res, next) => {
   try {
     const { name, email, subject, message } = req.body;
 
     let newMessage = null;
-    let dbSaved = false;
 
-    // 1. Try to save to database first
+    // Save to database (if connected)
     if (dbConnected) {
       try {
         newMessage = await Message.create({
@@ -19,52 +18,49 @@ export const createMessage = async (req, res, next) => {
           subject,
           message,
         });
-        dbSaved = true;
       } catch (dbError) {
-        console.error('Database save failed:', dbError.message);
+        console.error("DB save failed:", dbError.message);
       }
-    } else {
-      console.warn('Database not connected. Skipping save.');
     }
 
-    // 2. Try to send email notification
-    let emailSent = false;
-    try {
-      await sendEmail({
+    // Respond immediately to the client
+    res.status(201).json({
+      success: true,
+      message: "Message received successfully",
+      data: newMessage,
+    });
+
+    // Send email notification in the background
+    setImmediate(() => {
+      sendEmail({
         name,
         email,
         subject,
         message,
+      }).catch((err) => {
+        console.error("Email failed:", err.message);
       });
-      emailSent = true;
-    } catch (emailError) {
-      console.error('Email notification failed:', emailError.message);
-    }
-
-    // 3. Respond based on what succeeded
-    if (dbSaved || emailSent) {
-      return res.status(201).json({
-        success: true,
-        message: emailSent 
-          ? 'Message received and notification sent.' 
-          : 'Message received (notification pending).',
-        data: newMessage,
-      });
-    }
-
-    // Both failed
-    throw new ApiError(503, 'Message service is currently unavailable. Please try again later.');
+    });
   } catch (error) {
-    next(error);
+    // Only forward errors if a response hasn't been sent yet
+    if (!res.headersSent) {
+      next(error);
+    } else {
+      console.error("Error after response sent:", error);
+    }
   }
 };
 
 export const getMessages = async (req, res, next) => {
   try {
     const messages = await Message.find().sort({ createdAt: -1 });
-    res.json({ success: true, data: messages });
-  } catch (err) {
-    next(err);
+
+    res.json({
+      success: true,
+      data: messages,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -75,19 +71,33 @@ export const markMessageRead = async (req, res, next) => {
       { read: true },
       { new: true }
     );
-    if (!doc) throw new ApiError(404, 'Message not found');
-    res.json({ success: true, data: doc });
-  } catch (err) {
-    next(err);
+
+    if (!doc) {
+      throw new ApiError(404, "Message not found");
+    }
+
+    res.json({
+      success: true,
+      data: doc,
+    });
+  } catch (error) {
+    next(error);
   }
 };
 
 export const deleteMessage = async (req, res, next) => {
   try {
     const doc = await Message.findByIdAndDelete(req.params.id);
-    if (!doc) throw new ApiError(404, 'Message not found');
-    res.json({ success: true, message: 'Message deleted' });
-  } catch (err) {
-    next(err);
+
+    if (!doc) {
+      throw new ApiError(404, "Message not found");
+    }
+
+    res.json({
+      success: true,
+      message: "Message deleted",
+    });
+  } catch (error) {
+    next(error);
   }
 };

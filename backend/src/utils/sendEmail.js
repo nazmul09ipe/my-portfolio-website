@@ -1,60 +1,83 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
+
+// Create transporter once when the application starts
+const transporter =
+  process.env.EMAIL_USER && process.env.EMAIL_PASS
+    ? nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      })
+    : null;
 
 /**
- * Sends an email using Nodemailer
- * @param {Object} options - Email options
- * @param {string} options.name - Sender name
- * @param {string} options.email - Sender email
- * @param {string} options.subject - Email subject
- * @param {string} options.message - Email body
+ * Sends an email notification
+ * @param {Object} options
+ * @param {string} options.name
+ * @param {string} options.email
+ * @param {string} options.subject
+ * @param {string} options.message
  */
-export const sendEmail = async ({ name, email, subject, message }) => {
-  // Check if email configuration is available
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.warn('Email configuration missing. Skipping email sending.');
-    return;
+export const sendEmail = async ({
+  name,
+  email,
+  subject,
+  message,
+}) => {
+  // Skip email sending if not configured
+  if (!transporter) {
+    console.warn(
+      "Email configuration missing. Skipping email sending."
+    );
+    return null;
   }
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
 
   const mailOptions = {
     from: `"Portfolio Contact" <${process.env.EMAIL_USER}>`,
     to: process.env.EMAIL_TO || process.env.EMAIL_USER,
     replyTo: email,
-    subject: `New Message: ${subject || 'No Subject'}`,
+    subject: `New Message: ${subject || "No Subject"}`,
     html: `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-        <h2 style="color: #3b82f6; border-bottom: 2px solid #3b82f6; padding-bottom: 10px;">New Portfolio Message</h2>
-        
-        <div style="margin-top: 20px;">
-          <p><strong>From:</strong> ${name} &lt;${email}&gt;</p>
-          <p><strong>Subject:</strong> ${subject || 'No Subject'}</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2 style="color: #2563eb;">
+          New Portfolio Message
+        </h2>
+
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Subject:</strong> ${subject || "No Subject"}</p>
+
+        <hr style="margin: 20px 0;" />
+
+        <div>
+          <p><strong>Message:</strong></p>
+          <p style="white-space: pre-wrap; line-height: 1.6;">
+            ${message}
+          </p>
         </div>
-        
-        <div style="margin-top: 20px; background-color: #f8fafc; padding: 15px; border-radius: 6px;">
-          <p style="margin-top: 0; font-weight: bold; color: #64748b;">Message:</p>
-          <p style="white-space: pre-wrap; line-height: 1.6;">${message}</p>
-        </div>
-        
-        <div style="margin-top: 30px; font-size: 12px; color: #94a3b8; text-align: center;">
-          <p>Sent from your Portfolio Website</p>
-        </div>
+
+        <hr style="margin: 20px 0;" />
+
+        <p style="font-size: 12px; color: #64748b;">
+          Sent from your portfolio website.
+        </p>
       </div>
     `,
   };
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent: %s', info.messageId);
+
+    console.log("Email sent:", info.messageId);
+
     return info;
   } catch (error) {
-    console.error('Nodemailer Error:', error);
-    throw new Error('Failed to send email notification');
+    console.error("Nodemailer Error:", error);
+
+    throw new Error(
+      error.message || "Failed to send email notification"
+    );
   }
 };

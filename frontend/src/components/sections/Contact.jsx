@@ -64,38 +64,35 @@ export function Contact() {
   }, [form]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formErrors = validateForm();
-    if (Object.keys(formErrors).length > 0) {
-      setErrors(formErrors);
-      return;
-    }
+  e.preventDefault();
 
-    setSubmitting(true);
-    const toastId = toast.loading(
-      "Sending your transmission to the digital core...",
-    );
-    try {
-      await sendMessage(form);
-      toast.success("Transmission Received! I will reach out shortly.", {
-        id: toastId,
-        icon: "🚀",
-      });
-      setForm(initialForm);
-      setErrors({});
-    } catch (err) {
-      console.error("Contact Form Error:", err);
-      const isUnavailable = err.status === 503;
-      toast.error(
-        isUnavailable
-          ? "The message service is temporarily overloaded. Please try again in a few minutes or email me directly."
-          : err.message || "Failed to send message. Please try again later.",
-        { id: toastId, duration: 6000 },
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const formErrors = validateForm();
+  if (Object.keys(formErrors).length > 0) {
+    setErrors(formErrors);
+    return;
+  }
+
+  setSubmitting(true);
+
+  const toastId = toast.loading("Sending message...");
+
+  try {
+    await sendMessage(form);
+
+    toast.success("Message sent successfully 🚀", {
+      id: toastId,
+    });
+
+    setForm(initialForm);
+    setErrors({});
+  } catch (err) {
+    toast.error("Failed to send message", {
+      id: toastId,
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const inputClass = "input-field";
   const errorClass = "border-red-500 focus:ring-red-500 focus:border-red-500";

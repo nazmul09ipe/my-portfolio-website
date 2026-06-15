@@ -55,17 +55,17 @@ export function Skills() {
   const ref = useScrollAnimation({ children: true, stagger: 0.05 });
 
   useEffect(() => {
-    setError(null);
-    fetchSkills()
-      .then((data) => {
-        if (data?.length) setSkills(data);
-      })
-      .catch((err) => {
-        console.error("Skills Fetch Error:", err);
-        setError(err.message || "Failed to load skills");
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  fetchSkills()
+    .then((data) => {
+      if (data?.length) setSkills(data);
+      else setSkills(fallbackSkills);
+    })
+    .catch((err) => {
+      console.error(err);
+      setSkills(fallbackSkills);
+    })
+    .finally(() => setLoading(false));
+}, []);
 
   const localSkills = skills.length > 0 ? skills : fallbackSkills;
 
@@ -86,7 +86,7 @@ export function Skills() {
           </div>
         )}
 
-        {error && !loading && (
+        {error && !loading && skills.length === 0 && (
           <div className="flex justify-center mb-12">
             <div className="glass-premium px-6 py-3 rounded-2xl border border-red-500/20 flex items-center gap-3">
               <HiExclamationCircle className="w-5 h-5 text-red-500" />

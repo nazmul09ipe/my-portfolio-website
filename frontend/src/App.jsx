@@ -1,45 +1,28 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { ThemeProvider } from '@/context/ThemeContext';
-import { AuthProvider } from '@/context/AuthContext';
-import { MainLayout } from '@/layouts/MainLayout';
-import { PageLoader } from '@/components/common/PageLoader';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
-const HomePage = lazy(() => import('@/pages/HomePage'));
-const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'));
+import { ThemeProvider } from "./context/ThemeContext";
+import { AuthProvider } from "./context/AuthContext";
 
-function LazyFallback() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <PageLoader />
-    </div>
-  );
-}
+import { MainLayout } from "./layouts/MainLayout";
+import { HomePage } from "./pages/HomePage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <Suspense fallback={<LazyFallback />}>
-            <Routes>
-              <Route element={<MainLayout />}>
-                <Route index element={<HomePage />} />
-                <Route path="*" element={<NotFoundPage />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
+          <Routes>
+            <Route element={<MainLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
+          </Routes>
 
-        <Toaster
-          position="top-center"
-          toastOptions={{
-            duration: 4000,
-            className:
-              'glass-premium !text-slate-100 !rounded-2xl',
-          }}
-        />
+          
+          
+        </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
   );

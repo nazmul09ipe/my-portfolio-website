@@ -189,13 +189,13 @@
 /* ── Base ── */
 html {
   scroll-behavior: smooth;
-  cursor: none;
+ 
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
-    scroll-behavior: auto;
-  }
+  scroll-behavior: smooth;
+}
   
   *, ::before, ::after {
     animation-duration: 0.01ms !important;
@@ -213,8 +213,12 @@ body {
   cursor: none;
   /* GPU acceleration for the whole body to prevent flickering */
   transform: translateZ(0);
+  cursor: default;
 }
 
+a, button {
+  cursor: pointer;
+}
 /* ── Optimization Classes ── */
 .gpu-accel {
   transform: translate3d(0, 0, 0);
@@ -232,7 +236,7 @@ body {
 }
 
 a, button {
-  cursor: none;
+  cursor: default;
 }
 
 ::selection {
